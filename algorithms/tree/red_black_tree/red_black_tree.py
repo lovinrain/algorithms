@@ -2,19 +2,48 @@
 Implementation of Red-Black tree.
 """
 
+class RBValue(float):
+    def __new__(cls, key, data):
+        # self = super(RBValue, cls).__new__(cls, key)
+        self = super().__new__(cls, key)
+        self.data = data
+        return self
 
 class RBNode:
-    def __init__(self, val, is_red, parent=None, left=None, right=None):
+    def __init__(self, val: RBValue, is_red, parent=None, left=None, right=None):
         self.val = val
         self.parent = parent
         self.left = left
         self.right = right
         self.color = is_red
 
+    @staticmethod
+    def genNewNode(key, data=None):
+        return RBNode(RBValue(key, data), 1)
+
 
 class RBTree:
     def __init__(self):
         self.root = None
+
+    def search(self, data):
+        return self.recur_search(self.root, data)
+
+    def recur_search(self, root, val):
+        if root is None:
+            return False
+        if root.val == val:
+            return True
+        elif val > root.val:     # Go to right root
+            return self.recur_search(root.right, val)
+        else:                      # Go to left root
+            return self.recur_search(root.left, val)
+
+    def recur_size(self, root):
+        if root is None:
+            return 0
+        else:
+            return 1 + self.recur_size(root.left) + self.recur_size(root.right)
 
     def left_rotate(self, node):
         # set the node as the left child node of the current node's right node
@@ -59,6 +88,8 @@ class RBTree:
             node.parent = left_node
 
     def insert(self, node):
+        if type(node) is not RBNode:
+            node = RBNode.genNewNode(node)
         # the inserted node's color is default is red
         root = self.root
         insert_node_parent = None
@@ -82,7 +113,7 @@ class RBTree:
         node.left = None
         node.right = None
         node.color = 1
-        # fix the tree to 
+        # fix the tree to
         self.fix_insert(node)
 
     def fix_insert(self, node):
@@ -144,7 +175,7 @@ class RBTree:
         """
         replace u with v
         :param node_u: replaced node
-        :param node_v: 
+        :param node_v:
         :return: None
         """
         if node_u.parent is None:
@@ -153,15 +184,15 @@ class RBTree:
             node_u.parent.left = node_v
         elif node_u is node_u.parent.right:
             node_u.parent.right = node_v
-        # check is node_v is None 
+        # check is node_v is None
         if node_v:
             node_v.parent = node_u.parent
 
     def maximum(self, node):
         """
-        find the max node when node regard as a root node   
-        :param node: 
-        :return: max node 
+        find the max node when node regard as a root node
+        :param node:
+        :return: max node
         """
         temp_node = node
         while temp_node.right is not None:
@@ -170,9 +201,9 @@ class RBTree:
 
     def minimum(self, node):
         """
-        find the minimum node when node regard as a root node   
+        find the minimum node when node regard as a root node
         :param node:
-        :return: minimum node 
+        :return: minimum node
         """
         temp_node = node
         while temp_node.left:
@@ -193,7 +224,7 @@ class RBTree:
             node_min = self.minimum(node.right)
             node_color = node_min.color
             temp_node = node_min.right
-            ## 
+            ##
             if node_min.parent != node:
                 self.transplant(node_min, node_min.right)
                 node_min.right = node.right
@@ -215,7 +246,7 @@ class RBTree:
                 node_brother = node.parent.right
 
                 # case 1: node's red, can not get black node
-                # set brother is black and parent is red 
+                # set brother is black and parent is red
                 if node_brother.color == 1:
                     node_brother.color = 0
                     node.parent.color = 1
@@ -286,7 +317,24 @@ if __name__ == "__main__":
     rb = RBTree()
     children = [11, 2, 14, 1, 7, 15, 5, 8, 4]
     for child in children:
-        node = RBNode(child, 1)
+        # node = RBNode(child, 1)
+        import time
+        node = RBNode.genNewNode(child, time.time())
         print(child)
         rb.insert(node)
     print(rb.inorder())
+
+    rb = RBTree()
+    rb.insert(10)
+    rb.insert(15)
+    rb.insert(6)
+    rb.insert(4)
+    rb.insert(9)
+    rb.insert(12)
+    rb.insert(24)
+    rb.insert(7)
+    rb.insert(20)
+    rb.insert(30)
+    rb.insert(18)
+
+    print()
